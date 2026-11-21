@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Valorant Blind Box Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--text:#f4f6fb;--muted:rgba(244,246,251,.66);--line:rgba(255,255,255,.16);--red:#ff4655;--teal:#0ff0d1;--glass:rgba(8,10,16,.55);color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#1a0509;color:var(--text);font:400 16px/1.55 Inter,system-ui,sans-serif;overflow-x:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:1;display:block;touch-action:pan-y}
+.sec{position:relative;z-index:2;min-height:100vh;padding:110px 6vw 80px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;pointer-events:none}
+.sec>*:not(.giant){pointer-events:auto}
+.giant{position:absolute;z-index:0;left:0;top:50%;white-space:nowrap;font:700 clamp(10rem,32vw,30rem)/.8 Teko,sans-serif;text-transform:uppercase;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.22);transform:translate(var(--sx,0),-50%);pointer-events:none;user-select:none}
+nav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:16px 6vw;padding-top:calc(16px + env(safe-area-inset-top,0px))}
+.logo{font:600 1.6rem Teko,sans-serif;letter-spacing:1px;text-decoration:none;color:var(--text)}
+nav .d{border:0;cursor:pointer;font-size:.85rem;font-weight:600;padding:10px 18px;border-radius:99px;background:#fff;color:#111;text-decoration:none}
+h1,h2{font-family:Teko,sans-serif;font-weight:600;text-transform:uppercase;line-height:.9;position:relative;z-index:1}
+h1{font-size:clamp(3.4rem,9vw,8rem);max-width:8ch}
+h2{font-size:clamp(2.6rem,6vw,5rem)}
+.lead{max-width:380px;color:var(--muted);margin-top:20px;position:relative;z-index:1}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px;position:relative;z-index:1}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:.9rem;padding:14px 24px;border-radius:99px;border:1px solid transparent;text-decoration:none;background:#fff;color:#111;transition:transform .2s}
+.btn:hover{transform:translateY(-3px)}
+.btn.o{background:none;color:var(--text);border-color:var(--line)}
+.hint{margin-top:22px;font-size:.8rem;color:var(--muted);position:relative;z-index:1}
+.hero{justify-content:flex-end}
+.side{width:min(560px,100%)}
+.right{margin-left:auto}
+.sub{color:var(--muted);margin:14px 0 26px;max-width:460px}
+.list{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.t{display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:center;width:100%;text-align:left;padding:15px 20px;background:none;border:0;border-bottom:1px solid var(--line);transition:background .2s}
+.t:last-child{border:0}
+.t.on{background:rgba(255,255,255,.12)}
+.t small{display:block;color:var(--muted);font-size:.74rem}
+.t .p{font:600 1.5rem Teko,sans-serif}
+.t .o{font-size:.75rem;font-weight:600;padding:7px 14px;border-radius:99px;background:#fff;color:#111;opacity:0;transition:opacity .2s}
+.t.on .o,.t:focus-visible .o{opacity:1}
+@media(hover:none){.t .o{opacity:1}}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chips span{padding:11px 18px;border-radius:99px;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(10px);font-size:.88rem}
+.chips .pri{background:#fff;color:#111;font-weight:600}
+.band{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;position:relative;z-index:1}
+.id{display:flex;align-items:center;gap:14px;padding:16px 24px;border-radius:99px;background:#fff;color:#111;border:0}
+.id b{font:600 1.7rem Teko,sans-serif;letter-spacing:1px}
+.id small{display:block;font-size:.7rem;margin-bottom:-4px;color:#555}
+.info{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:18px;padding:28px}
+.info li{list-style:none;display:flex;gap:18px;padding:13px 0;border-bottom:1px solid var(--line);font-size:.9rem;color:var(--muted)}
+.info li:first-child{padding-top:0}.info li:last-child{border:0;padding-bottom:0}
+.info b{flex:0 0 130px;color:var(--text)}
+.warn{margin-top:18px;font-size:.84rem;font-weight:600}
+footer{margin-top:40px;font-size:.76rem;color:var(--muted)}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);opacity:0;background:#fff;color:#111;padding:12px 22px;border-radius:99px;font-size:.86rem;font-weight:500;z-index:50;transition:.3s;pointer-events:none}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.gal{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.card{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:16px;backdrop-filter:blur(10px);transition:transform .25s,border-color .25s}
+.card:hover{transform:perspective(600px) rotateX(7deg) translateY(-5px);border-color:rgba(255,255,255,.4)}
+.card canvas{width:100%;display:block}.card b{display:block;font:600 1.4rem Teko,sans-serif;text-transform:uppercase;margin-top:6px}.card small{color:var(--muted);font-size:.78rem}
+.mod{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(0,0,0,.62);backdrop-filter:blur(6px);padding:20px}.mod[hidden]{display:none}
+.mc{background:#12151c;border:1px solid var(--line);border-radius:20px;padding:28px;max-width:460px;width:100%}
+.mc h3{font:600 2.2rem/1 Teko,sans-serif;text-transform:uppercase}.mc p{color:var(--muted);font-size:.88rem;margin-top:8px}
+.mc textarea{width:100%;background:#0b0d12;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;resize:none;margin:14px 0 0}
+.read{display:flex;align-items:baseline;gap:14px;margin-bottom:14px;position:relative;z-index:1}
+.read b{font:600 5.5rem/.8 Teko,sans-serif;color:var(--teal);text-shadow:0 0 30px rgba(15,240,209,.5)}
+.read span{font:600 1.7rem Teko,sans-serif;text-transform:uppercase}
+#fv{position:fixed;inset:0;z-index:55;background:rgba(8,10,16,.96);overflow:auto;backdrop-filter:blur(8px)}#fv[hidden]{display:none}
+#fv:not([hidden]){animation:fin .35s cubic-bezier(.2,.8,.2,1)}@keyframes fin{from{opacity:0;transform:scale(1.04)}}
+.fv-top{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 6vw;padding-top:calc(14px + env(safe-area-inset-top,0px));background:rgba(8,10,16,.85);border-bottom:1px solid var(--line)}
+.fv-top h3{font:600 1.6rem Teko,sans-serif;text-transform:uppercase}.fv-top .g{display:flex;gap:8px}
+.sq{background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:99px;padding:8px 16px;font-size:.82rem}
+.sq:hover:not(:disabled){border-color:var(--teal)}.sq:disabled{opacity:.35;cursor:default}
+.fv-body{display:grid;grid-template-columns:1.25fr 1fr;gap:24px;max-width:1180px;margin:0 auto;padding:28px 6vw;align-items:center;min-height:calc(100vh - 70px)}
+.iso{height:min(60vh,460px);display:grid;place-items:center;perspective:1200px}
+.plate{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(420px,78vw);aspect-ratio:1;padding:14px;border-radius:10px;background:#1a1f2b;transform:rotateX(58deg) rotateZ(-38deg);transform-style:preserve-3d;box-shadow:14px 14px 0 #10141c,30px 30px 60px #000}
+.rm{border:1px solid var(--line);border-radius:6px;background:#242b3a;transform-style:preserve-3d;transition:transform .35s,background .3s,box-shadow .3s;text-align:left;padding:10px;font:600 1.1rem Teko,sans-serif;text-transform:uppercase;color:var(--muted)}
+.rm:hover{transform:translateZ(14px);background:#2d3548;color:var(--text)}
+.rm.on{transform:translateZ(34px);background:var(--red);color:#fff;box-shadow:-10px 10px 0 rgba(255,70,85,.3),0 0 40px rgba(255,70,85,.5)}
+.rcard{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:28px;min-height:280px;display:flex;flex-direction:column;justify-content:space-between}
+.rcard .k{font-size:.8rem;color:var(--teal)}.rcard h4{font:600 2.6rem/1 Teko,sans-serif;text-transform:uppercase;margin:8px 0 12px}.rcard p{color:var(--muted);max-width:360px}
+.nav2{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px}
+.dots{display:flex;gap:6px}.dots i{width:22px;height:3px;background:var(--line);transition:.3s}.dots i.on{background:var(--teal)}
+@media(max-width:820px){.fv-body{grid-template-columns:1fr;padding:16px;min-height:0}.iso{height:300px}.plate{width:240px}.read b{font-size:4rem}}
+@media(max-width:760px){.right{margin-left:0}.sec{padding-top:90px}.info li{flex-direction:column;gap:2px}.list,.info,.chips span{background:rgba(8,10,16,.78)}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+<nav><a class="logo" href="#top">Blindbox</a><button class="d" onclick="showOrder(-1)">Discord: aqxrzz</button></nav>
+
+<section class="sec hero" id="top">
+  <div class="giant" data-k=".25">Blind box</div>
+  <h1>Random skins. Nothing stuffed.</h1>
+  <p class="lead">Quality-guaranteed Valorant blind-box accounts. Every bundle includes pass content, effects and audio. No filler 100-skin dumps.</p>
+  <div class="acts"><a class="btn" href="#tiers">Pick a tier</a><button class="btn o" id="tog">Open / close the box</button></div>
+  <p class="hint">Click the box. Scroll to explore.</p>
+</section>
+
+<section class="sec" id="tiers">
+  <h2>Pick your floor</h2>
+  <p class="sub">Hover the tower to scan a floor, click one to step inside. RMB converted at 7.88:1, plus €3 markup. Level 20+ unless noted.</p>
+  <div class="read"><b id="rNum">07</b><span id="rLbl"></span></div>
+  <div class="list side" id="list"></div>
+</section>
+
+<section class="sec" id="loot">
+  <div class="giant" data-k="-.25">Loot</div>
+  <div class="side right"><h2>What could be inside</h2>
+  <p class="sub">Every box rolls a random mix of hot and cold skins across weapon classes.</p>
+  <div class="gal" id="gal"></div></div>
+</section>
+
+<section class="sec" id="servers">
+  <div class="giant" data-k="-.2">Servers</div>
+  <div class="side"><h2>Play where you play</h2>
+  <p class="sub">Default is Asia-Pacific, with cross-play between HK / JP / SG / MY. Other regions on request.</p>
+  <div class="chips"><span class="pri">Asia-Pacific (default)</span><span>Hong Kong</span><span>Japan</span><span>Singapore</span><span>Malaysia</span><span>EU</span><span>NA</span><span>Latin America</span><span>Korea</span><span>Brazil</span></div></div>
+</section>
+
+<section class="sec" id="discord">
+  <div class="giant" data-k=".3">Order</div>
+  <div class="band"><div><h2>Order on Discord</h2><p class="sub" style="margin-bottom:0">Message for orders, custom tiers or server-specific accounts. Fastest replies on Discord.</p></div>
+  <button class="id" onclick="copy('aqxrzz','Copied “aqxrzz” to your clipboard.')"><span><small>Click to copy</small><b>aqxrzz</b></span></button></div>
+</section>
+
+<section class="sec" id="terms">
+  <div class="side"><h2>Purchase terms</h2>
+  <div class="info" style="margin-top:26px"><ul>
+    <li><b>Warranty</b><span>3 hours. Covers first-login ban, region lock, wrong password, account suspension. Non-account issues excluded.</span></li>
+    <li><b>Virtual goods</b><span>Copyable by nature. No refunds after sale.</span></li>
+    <li><b>Skin variance</b><span>Minor count differences possible. No returns for variance.</span></li>
+    <li><b>Randomization</b><span>Hot/cold skins and rank are randomized. Cannot be specified.</span></li>
+    <li><b>Account type</b><span>These are not full-price retail accounts.</span></li>
+  </ul><p class="warn">Ordering means you have read and accepted the product description.</p></div>
+  <footer>RMB→EUR at 7.88 · €3 markup included · Discord aqxrzz</footer></div>
+</section>
+<div id="fv" hidden role="dialog" aria-modal="true" aria-label="Floor view">
+  <div class="fv-top"><h3 id="fT"></h3><div class="g"><button class="sq" id="fDn">▼ Floor</button><button class="sq" id="fUp">▲ Floor</button><button class="sq" id="fX">Close</button></div></div>
+  <div class="fv-body"><div class="iso"><div class="plate" id="plate"></div></div>
+  <div><div class="rcard"><div><div class="k" id="rK"></div><h4 id="rH"></h4><p id="rP"></p></div>
+  <div class="nav2"><button class="sq" id="rPrev">← Previous</button><div class="dots" id="dots"></div><button class="sq" id="rNext">Next →</button></div></div>
+  <div class="acts"><button class="btn" id="fOrder"></button><button class="btn o" id="fBack">Back to tower</button></div></div></div>
+</div>
+<div class="mod" id="mod" hidden role="dialog" aria-modal="true" aria-labelledby="mT"><div class="mc">
+  <h3 id="mT"></h3><p id="mP"></p><textarea id="mM" readonly rows="3"></textarea>
+  <div class="acts"><button class="btn" id="mCopy">Copy message</button><a class="btn o" id="mGo" target="_blank" rel="noopener">Open Discord</a><button class="btn o" id="mX">Close</button></div>
+  <p id="mN"></p></div></div>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const RATE=7.88,FEE=3,ID="aqxrzz",$=id=>document.getElementById(id);
+const T=[[0,10,5.88,""],[10,20,12.88,""],[20,30,18.88,""],[30,40,22.88,"Main weapon effects"],[40,50,28.88,""],[50,80,38.88,"Includes VP knife skin"],[80,100,58.88,"Best seller"],[100,150,68.88,""],[150,200,88.88,""],[200,999,98.88,"200+ skins"]]
+.map(([lo,hi,r,note],i)=>({i,note,label:hi>=999?lo+"+ skins":lo+"–"+hi+" skins",price:(r/RATE+FEE).toFixed(2)}));
+let tier=6,openBox;
+$("list").innerHTML=T.map(t=>`<button class="t" data-i="${t.i}"><span>${t.label}<small>${t.note||"Random hot/cold bundle"}</small></span><span class="p">€${t.price}</span><span class="o" data-o="${t.i}">Enter</span></button>`).join("");
+const rows=[...document.querySelectorAll(".t")];
+function setTier(i){tier=i;rows.forEach((r,k)=>r.classList.toggle("on",k===i));$("rNum").textContent=String(i+1).padStart(2,"0");$("rLbl").textContent=T[i].label+" · €"+T[i].price;if(typeof openBox==="function")openBox(true)}
+rows.forEach((r,i)=>{r.onpointerenter=r.onfocus=()=>setTier(i);r.onclick=()=>openFloor(i)});
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2600)}
+function copy(s,m){const ok=()=>toast(m),fb=()=>{const a=document.createElement("textarea");a.value=s;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();let r=false;try{r=document.execCommand("copy")}catch(e){}a.remove();r?ok():toast("Select and copy: "+s)};navigator.clipboard?navigator.clipboard.writeText(s).then(ok,fb):fb()}
+setTier(6);
+
+/* ===== order modal ===== */
+const DISCORD_ID=""; /* numeric Discord user ID: makes "Open Discord" jump straight to your profile */
+const dcHref=DISCORD_ID?"https://discord.com/users/"+DISCORD_ID:"https://discord.com/app";
+function showOrder(i){const t=i>=0?T[i]:null;
+ $("mT").textContent=t?t.label+" · €"+t.price:"Order on Discord";
+ $("mM").value=t?`Hi! I'd like to order the ${t.label} blind box (€${t.price}).`:"Hi! I'd like to order a blind box.";
+ $("mP").textContent="Your message is copied. Send it to "+ID+" on Discord.";
+ $("mN").textContent=DISCORD_ID?"":"Open Discord, search for “"+ID+"” and paste your message.";
+ $("mGo").href=dcHref;$("mod").hidden=false;$("mCopy").focus();copy($("mM").value,"Order message copied.")}
+const hideOrder=()=>{$("mod").hidden=true};
+$("mCopy").onclick=()=>copy($("mM").value,"Order message copied.");$("mX").onclick=hideOrder;
+$("mod").addEventListener("click",e=>{if(e.target.id==="mod")hideOrder()});
+addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("mod").hidden){hideOrder();e.stopImmediatePropagation()}});
+
+/* ===== floor view ===== */
+const ROOMS=t=>[
+ {n:"Skins",k:"Room 1 of 4",h:t.label,p:"A random mix of hot and cold skins. Which ones you get is part of the blind box."},
+ {n:"Pass content",k:"Room 2 of 4",h:"Pass content",p:"Every bundle includes pass content, so the account is not just a pile of filler skins."},
+ {n:"Effects & audio",k:"Room 3 of 4",h:"Effects & audio",p:(t.note&&t.note!=="Best seller"&&t.note!=="200+ skins"?t.note+". ":"")+"Effects and audio come with the bundle."},
+ {n:"Account",k:"Room 4 of 4",h:"Level 20+",p:"Rank is random and cannot be chosen. Asia-Pacific by default, other servers on request."}];
+let fi=0,ri=0;const fv=$("fv"),plate=$("plate");
+function openFloor(i){fi=i;ri=0;setTier(i);fv.hidden=false;document.body.style.overflow="hidden";fv.scrollTop=0;drawF();$("fX").focus()}
+function closeFloor(){fv.hidden=true;document.body.style.overflow=""}
+function drawF(){const t=T[fi],R=ROOMS(t);
+ $("fT").textContent="Floor "+String(fi+1).padStart(2,"0")+" · "+t.label+" · €"+t.price;
+ plate.innerHTML=R.map((r,k)=>`<button class="rm" data-k="${k}">${r.n}</button>`).join("");
+ plate.querySelectorAll(".rm").forEach(b=>b.onclick=()=>{ri=+b.dataset.k;drawR()});
+ $("dots").innerHTML=R.map(()=>"<i></i>").join("");
+ $("fOrder").textContent="Order "+t.label+" · €"+t.price;
+ $("fDn").disabled=fi===0;$("fUp").disabled=fi===T.length-1;drawR()}
+function drawR(){const r=ROOMS(T[fi])[ri];$("rK").textContent=r.k;$("rH").textContent=r.h;$("rP").textContent=r.p;
+ plate.querySelectorAll(".rm").forEach((b,k)=>b.classList.toggle("on",k===ri));
+ $("dots").querySelectorAll("i").forEach((d,k)=>d.classList.toggle("on",k===ri))}
+const stepR=d=>{ri=(ri+d+4)%4;drawR()},stepF=d=>{const n=fi+d;if(n>=0&&n<T.length){fi=n;ri=0;setTier(n);drawF()}};
+$("rPrev").onclick=()=>stepR(-1);$("rNext").onclick=()=>stepR(1);$("fUp").onclick=()=>stepF(1);$("fDn").onclick=()=>stepF(-1);
+$("fX").onclick=$("fBack").onclick=closeFloor;$("fOrder").onclick=()=>showOrder(fi);
+addEventListener("keydown",e=>{if(fv.hidden||!$("mod").hidden)return;
+ if(e.key==="Escape")closeFloor();else if(e.key==="ArrowRight")stepR(1);else if(e.key==="ArrowLeft")stepR(-1);else if(e.key==="ArrowUp"){e.preventDefault();stepF(1)}else if(e.key==="ArrowDown"){e.preventDefault();stepF(-1)}});
+
+/* ===== weapon silhouettes (original shapes, drawn in code) ===== */
+const W={knife:[[[10,88],[130,40],[196,58],[120,80]],[[150,60],[240,50],[246,66],[156,78]]],
+ pistol:[[[40,40],[200,40],[210,52],[200,64],[40,64]],[[60,64],[100,64],[88,110],[56,110]],[[104,64],[130,64],[124,78],[108,78]]],
+ rifle:[[[10,54],[60,48],[230,50],[246,58],[230,66],[60,70],[10,82]],[[110,70],[140,70],[132,112],[104,112]],[[70,70],[92,70],[84,102],[64,102]],[[200,42],[214,42],[214,50],[200,50]]],
+ sniper:[[[8,64],[90,58],[246,60],[246,68],[90,76],[8,86]],[[80,34],[170,34],[170,50],[80,50]],[[100,50],[112,50],[112,60],[100,60]],[[100,76],[124,76],[118,106],[96,106]]]};
+function weapon(c,type,col){const x=c.getContext("2d");x.clearRect(0,0,256,128);x.fillStyle=col;x.shadowColor=col;x.shadowBlur=12;
+ W[type].forEach(p=>{x.beginPath();p.forEach(([a,b],i)=>i?x.lineTo(a,b):x.moveTo(a,b));x.closePath();x.fill()});return c}
+const mk=()=>{const c=document.createElement("canvas");c.width=256;c.height=128;return c};
+$("gal").innerHTML=[["knife","Melee","#ff4655"],["pistol","Sidearms","#0ff0d1"],["rifle","Rifles","#e8c56a"],["sniper","Snipers","#9b8cff"]]
+ .map(([k,n,c])=>`<div class="card"><canvas width="256" height="128" data-k="${k}" data-c="${c}"></canvas><b>${n}</b><small>Hot or cold, random</small></div>`).join("");
+document.querySelectorAll("#gal canvas").forEach(c=>weapon(c,c.dataset.k,c.dataset.c));
+
+/* ===== 3D ===== */
+try{
+const cvs=$("gl"),mobile=()=>innerWidth<760,reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+const R=new THREE.WebGLRenderer({canvas:cvs,antialias:true,alpha:true});
+R.setPixelRatio(Math.min(devicePixelRatio,2));
+const S=new THREE.Scene(),C=new THREE.PerspectiveCamera(40,1,.1,50);C.position.z=7.5;
+S.add(new THREE.AmbientLight(0xffffff,.55));
+const L1=new THREE.PointLight(0xff4655,2.2,30);L1.position.set(4,3,5);S.add(L1);
+const L2=new THREE.PointLight(0x0ff0d1,1.6,30);L2.position.set(-5,-2,3);S.add(L2);
+
+const G=new THREE.Group();S.add(G);
+const shell=new THREE.MeshStandardMaterial({color:0x151922,metalness:.85,roughness:.22});
+const edge=new THREE.LineBasicMaterial({color:0xff4655});
+const base=new THREE.Mesh(new THREE.BoxGeometry(1.7,1.3,1.7),shell);base.position.y=-.3;
+const lid=new THREE.Group();const lm=new THREE.Mesh(new THREE.BoxGeometry(1.8,.36,1.8),shell);lid.add(lm);lid.position.y=.53;
+[base,lm].forEach(m=>m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry),edge)));
+const core=new THREE.Mesh(new THREE.IcosahedronGeometry(.5,1),new THREE.MeshBasicMaterial({color:0xff4655,wireframe:true}));
+G.add(base,lid,core);
+
+const M=16,TY=["knife","pistol","rifle","sniper"],pal=[0xff4655,0x0ff0d1,0xffffff,0xe8c56a].map(c=>new THREE.Color(c)),P=[],shards=[];
+TY.forEach((ty,m)=>{const tx=new THREE.CanvasTexture(weapon(mk(),ty,"#ffffff"));
+ const im=new THREE.InstancedMesh(new THREE.PlaneGeometry(1.1,.55),new THREE.MeshBasicMaterial({map:tx,transparent:true,alphaTest:.15,side:THREE.DoubleSide,depthWrite:false}),M);
+ for(let i=0;i<M;i++){P.push({a:Math.random()*6.28,r:1.6+Math.random()*1.8,h:(Math.random()-.5)*3,sp:(.15+Math.random()*.3)*(i%2?1:-1),s:.5+Math.random()*.6,ph:Math.random()*9});im.setColorAt(i,pal[(i+m)%4])}
+ G.add(im);shards.push(im)});
+const TW=new THREE.Group();S.add(TW);
+const wt=(()=>{const c=document.createElement("canvas");c.width=128;c.height=32;const x=c.getContext("2d");x.fillStyle="#000";x.fillRect(0,0,128,32);x.fillStyle="#fff";for(let i=0;i<8;i++)x.fillRect(i*16+3,7,10,18);return new THREE.CanvasTexture(c)})();
+const FL=[];for(let i=0;i<10;i++){const f=new THREE.Mesh(new THREE.BoxGeometry(1.5,.32,1.5),new THREE.MeshStandardMaterial({color:0x1b2130,metalness:.6,roughness:.35,emissive:0x0ff0d1,emissiveMap:wt,emissiveIntensity:.18}));
+ f.position.y=(i-4.5)*.4;f.userData.i=i;f.add(new THREE.LineSegments(new THREE.EdgesGeometry(f.geometry),new THREE.LineBasicMaterial({color:0x4a5670})));TW.add(f);FL.push(f)}
+const spire=new THREE.Mesh(new THREE.CylinderGeometry(.02,.05,1),new THREE.MeshBasicMaterial({color:0xff4655}));spire.position.y=2.65;TW.add(spire);
+const scanM=new THREE.Mesh(new THREE.BoxGeometry(2.2,.03,2.2),new THREE.MeshBasicMaterial({color:0x0ff0d1,transparent:true,opacity:.85}));TW.add(scanM);
+
+let open=0,openT=0,mx=0,my=0,cur={x:0,y:0,s:1,tw:0,bg:new THREE.Color(0x1a0509),ac:new THREE.Color(0xff4655)};
+openBox=v=>{openT=v===undefined?(openT?0:1):(v?1:0)};
+$("tog").onclick=()=>openBox();
+const secs=["top","tiers","loot","servers","discord","terms"].map($);
+const K=()=>mobile()?[
+ {x:0,y:.9,s:.7,tw:0,bg:0x1a0509,ac:0xff4655},{x:0,y:1.5,s:.02,tw:.5,bg:0x04211f,ac:0x0ff0d1},{x:0,y:1.3,s:.5,tw:0,bg:0x1f1405,ac:0xe8c56a},{x:0,y:1.3,s:.5,tw:0,bg:0x120a2a,ac:0x9b8cff},{x:0,y:1.1,s:.7,tw:0,bg:0x161a44,ac:0x7c8bff},{x:0,y:1.4,s:.45,tw:0,bg:0x0a0c10,ac:0xff4655}]
+:[{x:1.8,y:.1,s:1.15,tw:0,bg:0x1a0509,ac:0xff4655},{x:2.6,y:0,s:.02,tw:1,bg:0x04211f,ac:0x0ff0d1},{x:-2.5,y:0,s:1,tw:0,bg:0x1f1405,ac:0xe8c56a},{x:2.6,y:0,s:1,tw:0,bg:0x120a2a,ac:0x9b8cff},{x:0,y:.9,s:1.15,tw:0,bg:0x161a44,ac:0x7c8bff},{x:2.6,y:0,s:.9,tw:0,bg:0x0a0c10,ac:0xff4655}];
+const ss=t=>t*t*(3-2*t),tmp=new THREE.Color(),tmp2=new THREE.Color(),D=new THREE.Object3D();
+function target(){const k=K(),mid=scrollY+innerHeight/2,c=secs.map(s=>s.offsetTop+s.offsetHeight/2);
+ let i=0;while(i<c.length-2&&mid>c[i+1])i++;
+ const t=ss(Math.max(0,Math.min(1,(mid-c[i])/(c[i+1]-c[i])))),a=k[i],b=k[i+1];
+ return{x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,s:a.s+(b.s-a.s)*t,tw:a.tw+(b.tw-a.tw)*t,bg:tmp.set(a.bg).lerp(tmp2.set(b.bg),t),ac:new THREE.Color(a.ac).lerp(new THREE.Color(b.ac),t)}}
+function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);C.aspect=w/h;C.updateProjectionMatrix()}
+addEventListener("resize",size);size();
+addEventListener("pointermove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;
+ if(cur.tw>.4&&e.target===cvs){v2.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(v2,C);const h=ray.intersectObjects(FL)[0];if(h&&h.object.userData.i!==tier)setTier(h.object.userData.i);cvs.style.cursor=h?"pointer":""}},{passive:true});
+const ray=new THREE.Raycaster(),v2=new THREE.Vector2();
+cvs.addEventListener("click",()=>{});
+addEventListener("click",e=>{if(e.target.closest("a,button,.list,.info,.chips,.mod,.gal,#fv"))return;v2.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(v2,C);if(cur.tw>.4){const h=ray.intersectObjects(FL)[0];if(h)openFloor(h.object.userData.i)}else if(ray.intersectObjects([base,lm]).length)openBox()});
+const giants=[...document.querySelectorAll(".giant")];
+let t0=performance.now();setTimeout(()=>openBox(true),700);
+(function loop(now){requestAnimationFrame(loop);const t=(now-t0)/1000;
+ const g=target();cur.x+=(g.x-cur.x)*.07;cur.y+=(g.y-cur.y)*.07;cur.s+=(g.s-cur.s)*.07;cur.tw+=(g.tw-cur.tw)*.07;cur.bg.lerp(g.bg,.07);cur.ac.lerp(g.ac,.07);
+ document.body.style.background="#"+cur.bg.getHexString();
+ edge.color.copy(cur.ac);core.material.color.copy(cur.ac);L1.color.copy(cur.ac);
+ open+=(openT-open)*.07;
+ G.position.set(cur.x,cur.y+Math.sin(t*1.2)*.08,0);G.scale.setScalar(cur.s);
+ G.rotation.y+=((reduce?0:t*.35)+scrollY*.0035+mx*.8-G.rotation.y)*.06;G.rotation.x+=(my*.5+.18-G.rotation.x)*.06;
+ lid.position.y=.53+open*1.1;lid.rotation.z=open*.45;lid.rotation.x=open*.15;
+ core.rotation.y=t*.8;core.scale.setScalar(.25+open*.9);
+ const n=6+tier*6,k=.08+open*.92,cnt=Math.min(M,Math.ceil(n/4));
+ shards.forEach((im,m)=>{im.count=cnt;for(let i=0;i<cnt;i++){const p=P[m*M+i],a=p.a+t*p.sp;
+  D.position.set(Math.cos(a)*p.r*k,.3+(p.h+Math.sin(t+p.ph)*.25)*k,Math.sin(a)*p.r*k);
+  D.rotation.set(0,-a+Math.PI/2+Math.sin(t*.7+p.ph)*.3,Math.sin(t+p.ph)*.25);D.scale.setScalar((.35+open*.65)*(.6+p.s));D.updateMatrix();im.setMatrixAt(i,D.matrix)}
+  im.instanceMatrix.needsUpdate=true});
+ TW.visible=cur.tw>.03;TW.position.set(cur.x,cur.y,0);TW.scale.setScalar(Math.max(.001,cur.tw));
+ TW.rotation.y+=((reduce?0:t*.3)+mx*.9-TW.rotation.y)*.05;TW.rotation.x+=(my*.25-TW.rotation.x)*.05;
+ FL.forEach((f,i)=>{const on=i===tier,m=f.material;m.emissiveIntensity+=((on?1.25:.18)-m.emissiveIntensity)*.15;m.emissive.copy(on?cur.ac:tmp.set(0x0ff0d1));f.position.x+=((on?.22:0)-f.position.x)*.15});
+ scanM.position.y+=(FL[tier].position.y-scanM.position.y)*.2;scanM.material.color.copy(cur.ac);
+ giants.forEach(el=>{const r=el.parentElement.getBoundingClientRect();el.style.setProperty("--sx",(r.top*parseFloat(el.dataset.k)-innerWidth*.05)+"px")});
+ cvs.style.opacity=mobile()&&scrollY>innerHeight*.6?.32:1;
+ R.render(S,C)})(t0);
+}catch(e){console.warn("WebGL unavailable",e);$("gl").style.display="none"}
+</script>
+</body>
+</html>
